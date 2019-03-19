@@ -8,17 +8,17 @@ def init_lgit(args):
     Initialize the directories structure
     """
     # Create lgit directory
-    try_and_pass_function(mkdir, FileExistError, "./.lgit")
+    try_and_pass_function(mkdir, FileExistsError, "./.lgit")
     # Create objects directory
-    try_and_pass_function(mkdir, FileExistError, "./.lgit/objects")
+    try_and_pass_function(mkdir, FileExistsError, "./.lgit/objects")
     # Create commit directory
-    try_and_pass_function(mkdir, FileExistError, "./.lgit/commmits")
+    try_and_pass_function(mkdir, FileExistsError, "./.lgit/commmits")
     # Create snapshots directory
-    try_and_pass_function(mkdir, FileExistError, "./.lgit/snapshots")
+    try_and_pass_function(mkdir, FileExistsError, "./.lgit/snapshots")
     # Create index file
-    index = open("./lgit/index", "w")
+    index = open("./.lgit/index", "w")
     # Create config file, write the user name on it
-    config = open("./lgit/config", "w")
+    config = open("./.lgit/config", "w")
     # Write the username to the config file
     config.write(environ.get("USER"))
     index.close()

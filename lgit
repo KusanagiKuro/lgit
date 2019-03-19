@@ -1,23 +1,2 @@
-init:
-- no args
-
-add:
-- multiple args
-
-commit:
-- 1 arg
-
-rm:
-- multiple args
-
-config:
-- 2 args, 1 must be --author
-
-ls-files:
-- no args
-
-status:
-- no args
-
-log:
-- no args
+What to do:
+- Create a function that will handle the filename, including

@@ -41,18 +41,18 @@ def main():
     # Parse the argument
     args = parser.parse_args()
     # Dictionary contains all the functions that each command will execute
-    # functionDict = {"init": init_lgit,
-    #                 "add": add_lgit,
-    #                 "rm": remove_lgit,
-    #                 "commit": commit_lgit,
-    #                 "config": config_lgit,
-    #                 "ls-files": list_files_lgit,
-    #                 "log": show_log_lgit,
-    #                 "status": show_status_lgit
-    #                 }
+    functionDict = {"init": init_lgit,
+                    "add": add_lgit,
+                    "rm": remove_lgit,
+                    "commit": commit_lgit,
+                    "config": config_lgit,
+                    "ls-files": list_files_lgit,
+                    "log": show_log_lgit,
+                    "status": show_status_lgit
+                    }
     print(args)
     # Pass the argument to the respective function to execute
-    # functionDict[args.command](args)
+    functionDict[args.command](args)
 
 
 if __name__ == "__main__":
