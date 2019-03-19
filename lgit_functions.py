@@ -19,7 +19,6 @@ def init_lgit(args):
     index = open("./.lgit/index", "w")
     # Create config file, write the user name on it
     config = open("./.lgit/config", "w")
-    # Write the username to the config file
     config.write(environ.get("USER"))
     index.close()
     config.close()
