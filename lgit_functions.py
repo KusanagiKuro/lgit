@@ -1,52 +1,63 @@
 #!/usr/bin/env python3
-from os import mkdir, environ
+from os import mkdir, environ, path
 from utility import try_and_pass_function
 
 
-def init_lgit():
+def init_lgit(args):
     """
     Initialize the directories structure
     """
     # Create lgit directory
-    try_and_pass_function(mkdir, FileExistError, "./lgit")
+    try_and_pass_function(mkdir, FileExistError, "./.lgit")
     # Create objects directory
-    try_and_pass_function(mkdir, FileExistError, "./lgit/objects")
+    try_and_pass_function(mkdir, FileExistError, "./.lgit/objects")
     # Create commit directory
-    try_and_pass_function(mkdir, FileExistError, "./lgit/commmits")
+    try_and_pass_function(mkdir, FileExistError, "./.lgit/commmits")
     # Create snapshots directory
-    try_and_pass_function(mkdir, FileExistError, "./lgit/snapshots")
+    try_and_pass_function(mkdir, FileExistError, "./.lgit/snapshots")
     # Create index file
     index = open("./lgit/index", "w")
     # Create config file, write the user name on it
     config = open("./lgit/config", "w")
+    # Write the username to the config file
     config.write(environ.get("USER"))
     index.close()
     config.close()
 
 
-def add_lgit():
+def check_lgit_directory(args):
+    """
+    Check if the working directory has a lgit directory in it or not.
+    """
+    return path.exist("./.lgit")
+
+
+def add_lgit(args):
+    if not check_lgit_directory:
+        print("fatal: not a git directory (or any of the parentdirectories)")
+        return
     pass
 
 
-def commit_lgit():
+def commit_lgit(args):
     pass
 
 
-def remove_lgit():
+def remove_lgit(args):
     pass
 
 
-def configure_lgit():
+def config_lgit(args):
     pass
 
 
-def show_status_lgit():
+def show_status_lgit(args):
     pass
 
 
-def list_files_lgit():
+def list_files_lgit(args):
     pass
 
 
-def show_log_lgit():
+def show_log_lgit(args):
     pass

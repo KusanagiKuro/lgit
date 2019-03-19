@@ -1,5 +1,23 @@
 init:
-- no parameter
+- no args
 
 add:
-- multiple variable 
+- multiple args
+
+commit:
+- 1 arg
+
+rm:
+- multiple args
+
+config:
+- 2 args, 1 must be --author
+
+ls-files:
+- no args
+
+status:
+- no args
+
+log:
+- no args
