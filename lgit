@@ -1,2 +1,2 @@
 What to do:
-- Create a function that will handle the filename, including
+- Create a function that will return if the files is being tracked or not.
