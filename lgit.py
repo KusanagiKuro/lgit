@@ -1,6 +1,8 @@
 #!/usr/bin/env python3
 from argparse import ArgumentParser
 from lgit_functions import *
+from add_lgit import add_lgit
+from utility import get_lgit_directory
 
 
 def createParser():
@@ -17,7 +19,7 @@ def createParser():
     add_parser = subparsers.add_parser("add")
     add_parser.add_argument("filenames", nargs="+")
     # Create a subparser for remove command
-    remove_parser = subparsers.add_parser("remove")
+    remove_parser = subparsers.add_parser("rm")
     remove_parser.add_argument("filenames", nargs="+")
     # Create a subparser for commit command
     commit_parser = subparsers.add_parser("commit")
@@ -41,18 +43,25 @@ def main():
     # Parse the argument
     args = parser.parse_args()
     # Dictionary contains all the functions that each command will execute
-    functionDict = {"init": init_lgit,
-                    "add": add_lgit,
-                    "rm": remove_lgit,
-                    "commit": commit_lgit,
-                    "config": config_lgit,
-                    "ls-files": list_files_lgit,
-                    "log": show_log_lgit,
-                    "status": show_status_lgit
-                    }
     print(args)
-    # Pass the argument to the respective function to execute
-    functionDict[args.command](args)
+    if args.command == "init":
+        init_lgit()
+    else:
+        parent_dir = get_lgit_directory()
+        if not lgit_directory:
+            print("fatal: not a git directory",
+                  "(or any of the parentdirectories)")
+            return
+        functionDict = {"add": add_lgit,
+                        "rm": remove_lgit,
+                        "commit": commit_lgit,
+                        "config": config_lgit,
+                        "ls-files": list_files_lgit,
+                        "log": show_log_lgit,
+                        "status": show_status_lgit
+                        }
+        # Pass the argument to the respective function to execute
+        functionDict[args.command](args, parent_dir)
 
 
 if __name__ == "__main__":
