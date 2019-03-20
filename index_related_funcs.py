@@ -1,4 +1,5 @@
 #!/usr/bin/env python3
+import os
 
 
 def read_index_file(descriptor):
@@ -42,14 +43,15 @@ def read_commit_and_path(descriptor):
     sha1_hash_when_commit = os.read(descriptor, 41).decode().lstrip()
     file_relativepath = ""
     next_char = os.read(descriptor, 1).decode()
-    while next_char != "\n":
+    while next_char != "\n" and next_char != "":
         next_char = os.read(descriptor, 1).decode()
+        print(next_char)
         file_relativepath += next_char
-    file_relativepath = file_relativepath[1:]
+    file_relativepath = file_relativepath.lstrip()
     return sha1_hash_when_commit, file_relativepath
 
 
-def update_current_info(descriptor, time, file_sha1_hash, filepath):
+def update_current_info(descriptor, time, file_sha1_hash):
     """
     Write the current time and sha1 hash of a file to the index file.
 
@@ -61,7 +63,7 @@ def update_current_info(descriptor, time, file_sha1_hash, filepath):
         - filepath: path to the current file
     """
     if file_sha1_hash == "":
-        print("Unalbe to index file", filepath)
+        print("updating files failed")
     # Convert the modification time of the file to string
     time = convert_mtime_to_formatted_string(current_path)
     # Write down the timestamp
@@ -87,3 +89,16 @@ def update_commit_info(descriptor, file_sha1_hash):
     else:
         blank = "                                        "
     os.write(descriptor, b" ")
+
+
+def update_file_path(descriptor, current_path):
+    """
+    Update the filename in index
+
+    Input:
+        - descriptor: a file descriptor. Point to the start of the filename
+        field
+        - current_path: relative path of the file from the lgit repository
+    """
+    os.write(descriptor, bytes(current_path, encoding="utf-8"))
+    os.write(descriptor, b"\n")

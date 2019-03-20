@@ -48,7 +48,7 @@ def main():
         init_lgit()
     else:
         parent_dir = get_lgit_directory()
-        if not lgit_directory:
+        if not parent_dir:
             print("fatal: not a git directory",
                   "(or any of the parentdirectories)")
             return
@@ -61,6 +61,7 @@ def main():
                         "status": show_status_lgit
                         }
         # Pass the argument to the respective function to execute
+        print(parent_dir)
         functionDict[args.command](args, parent_dir)
 
 

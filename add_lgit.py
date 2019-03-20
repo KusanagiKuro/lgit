@@ -12,24 +12,23 @@ def add_lgit(args, parent_dir):
 
     Input:
         - args: the arguments parsed by the add command subparser
+        - parent_dir: the directory that contains the lgit repository
     """
-    # If the current directory doesn't have .lgit directory, raise error
-    if not check_lgit_directory():
-        print("fatal: not a git directory (or any of the parentdirectories)")
-        return
     # Convert all the name from the arguments to relative path
+    print(args.filenames[::-1])
     path_list = [handle_path(name, parent_dir)
                  for name in args.filenames[::-1]]
+    print(path_list)
     while path_list:
-        # Pop each of path and execute the fitting function
+        # Pop each path and execute the fitting function
         current_path = path_list.pop()
-        if path.isfile(current_path):
+        # If the path doesn't exist, print an error message
+        if not path.exists(current_path):
+            print("fatal:", current_path, "did not match any files")
+        elif path.isfile(current_path):
             add_file(current_path)
         elif path.isdir(current_path):
             add_directory(current_path, path_list)
-        # If the path doesn't exist, print a warning message
-        else:
-            print("fatal:", current_path, "did not match any files")
 
 
 def add_file(current_path):
@@ -39,8 +38,8 @@ def add_file(current_path):
     Input:
         - current_path: relative path of the file from the base directory
     """
-    if not path_check(current_path, "r"):
-        return
+    # if not path_check(current_path, "r"):
+    #     return
     infos, descriptor = is_file_in_index(current_path)
     if not infos and not descriptor:
         return
@@ -61,7 +60,7 @@ def add_file(current_path):
     # relative filepath
     if not infos:
         update_commit_info(descriptor, None)
-        update_file_path(descriptor, current_path, current_path)
+        update_file_path(descriptor, current_path)
     # Close the file descriptor
     descriptor.close()
 
@@ -81,15 +80,14 @@ def is_file_in_index(filepath):
     """
     # Open the index file, raise erorr if needed
     try:
-        descriptor = os.open("./.lgit/index", os.OS_RDWR | os.OS_CREAT)
+        descriptor = os.open("./.lgit/index", os.O_RDWR | os.O_CREAT)
     except PermissionError:
-        descriptor = None
         print("Cannot open index file: PermissionDenied")
         return None, None
     # Read each line of the index file, stop if the file path is found or EOF
-    infos = read_index_file(file)
+    infos = read_index_file(descriptor)
     while filepath not in infos and infos != "":
-        infos = read_index_file(file)
+        infos = read_index_file(descriptor)
     # If the file is in the index file, return its info and the descriptor
     if infos:
         return infos, descriptor

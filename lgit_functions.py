@@ -1,10 +1,11 @@
 #!/usr/bin/env python3
 import os
-from os import mkdir, environ, path, O_RDONLY, O_RDWR, O_CREAT, lseek
-from utility import handle_path, hash_file_content, read_index_file
+from utility import try_and_pass_function
+from index_related_funcs import *
+from os import mkdir, environ
 
 
-def init_lgit(args):
+def init_lgit():
     """
     Initialize the directories structure
     """

@@ -17,6 +17,9 @@ def handle_path(name, parent_dir, absolute=False):
     """
     if name.startswith("~"):
         name = path.expanduser(name)
+    else:
+        name = path.abspath(name)
+    print(name)
     return path.relpath(name, parent_dir)
 
 
@@ -53,7 +56,7 @@ def get_lgit_directory():
     dirpath = path.abspath(".")
     while True:
         if path.exists(dirpath + "/.lgit") and path.isdir(dirpath + "/.lgit"):
-            return path
+            return dirpath
         elif dirpath == "/":
             return None
         else:
