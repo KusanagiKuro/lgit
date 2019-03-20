@@ -1,6 +1,7 @@
 #!/usr/bin/env python3
+import os
 from os import mkdir, environ, path, O_RDONLY, O_RDWR, O_CREAT
-from utility import try_and_pass_function
+from utility import *
 
 
 def init_lgit(args):
@@ -29,7 +30,7 @@ def check_lgit_directory():
     """
     Check if the working directory has a lgit directory in it or not.
     """
-    path = handle_file_path(".")
+    path = handle_path(".")
     while True:
         if path.exists(path + "/.lgit"):
             return True
@@ -58,12 +59,12 @@ def add_file(current_path):
     pass
 
 
-def find_file_in_index(filename):
+def is_file_in_index(filepath):
     """
-    Find the line that lists the filename in an index file
+    Check if the line that lists the file path in an index file
 
     Input:
-        - filename: the name of the file
+        - filepath: the relative path of the file
 
     Output:
         - descriptor: a file descriptor at the start of the line that has the
@@ -72,12 +73,14 @@ def find_file_in_index(filename):
           wrong
     """
     try:
-        file = open("./.lgit/index", "r+")
-    except PermissionDenied:
+        file = os.open("./.lgit/index", os.OS_RDWR)
+    except PermissionError:
         descriptor = None
         print("Cannot open index file: PermissionDenied")
         return None, False
-    readtext = os.read(descriptor, )
+    line = read_index_file(file)
+    while filepath not in line and line != None:
+        pass
     pass
 
 
