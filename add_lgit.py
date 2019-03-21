@@ -58,7 +58,7 @@ def add_file(current_path, parent_dir, descriptor, index_dict):
                 and file_sha1_hash == index_dict[current_path][2]):
             return
         # Move the file descriptor to the correct position
-        lseek(descriptor, get_line_position(index_dict, current_path), 0)
+        lseek(descriptor, index_dict[current_path][5], 0)
         # Update the timestamp. current sha1 hash, add sha1 hash
         update_file_index(descriptor, " ".join([time,
                                                 file_sha1_hash,
@@ -96,10 +96,7 @@ def make_directory_and_object_file(file_sha1_hash, file_content, parent_dir):
     except PermissionError:
         print("Cannot add an object to a lgit repository")
         return
-    if isinstance(file_content, bytes):
-        new_file.write(file_content)
-    else:
-        new_file.write(file_content.encode())
+    new_file.write(file_content)
 
 
 def add_directory(current_path, parent_dir, path_list):

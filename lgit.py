@@ -4,7 +4,7 @@ from simple_lgit_functions import *
 from add_lgit import add_lgit
 from commit_lgit import commit_lgit
 from remove_lgit import remove_lgit
-from show_status_lgit import show_status_lgitcd
+from show_status_lgit import show_status_lgit
 from utility import get_lgit_directory
 
 
@@ -45,11 +45,10 @@ def main():
     parser = createParser()
     # Parse the argument
     args = parser.parse_args()
-    # Dictionary contains all the functions that each command will execute
-    print(args)
     if args.command == "init":
         init_lgit()
     else:
+        # Dictionary contains all the functions that each command will execute
         parent_dir = get_lgit_directory()
         if parent_dir:
             functionDict = {"add": add_lgit,

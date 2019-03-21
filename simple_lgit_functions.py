@@ -50,7 +50,7 @@ def config_lgit(args, parent_dir):
 
 
 def list_files_lgit(args, parent_dir):
-    index_dict = None
+    index_dict = get_index_dictionary(parent_dir)
 
 
 def show_log_lgit(args, parent_dir):

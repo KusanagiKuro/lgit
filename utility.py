@@ -16,7 +16,7 @@ def handle_path(name, parent_dir):
     return path.relpath(name, parent_dir)
 
 
-def read_and_hash(path, binary=False):
+def read_and_hash(path):
     """
     Hash a content of a file using SHA1
 

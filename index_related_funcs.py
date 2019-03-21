@@ -23,18 +23,19 @@ def get_index_dictionary(parent_dir):
         return None
     # Save its content
     content = index_file.readlines()
+    index_info_list = []
+    char_count = 0
     # Split each line of the content into multiple fields
-    index_info_list = [(index_line[:14],
-                        index_line[15:55],
-                        index_line[56:96],
-                        index_line[97:137],
-                        index_line[138:-1])
-                       for index_line in content]
+    for order, index_line in enumerate(content):
+        index_info_list.append((index_line[:14],
+                                index_line[15:55],
+                                index_line[56:96],
+                                index_line[97:137],
+                                index_line[138:-1],
+                                char_count))
+        char_count += len(index_line)
     # Create the dictionary
-    index_dict = {index_info[4]: (index_info, (len(content[order - 1])
-                                               if order - 1 >= 0
-                                               else 0))
-                  for order, index_info in enumerate(index_info_list)}
+    index_dict = {index_info[4]: index_info for index_info in index_info_list}
     return index_dict
 
 
@@ -52,56 +53,8 @@ def get_line_position(index_dict, file_path):
         if key_name == file_path:
             break
         else:
-            position += index_dict[key_name][1]
+            position += index_dict[key_name][5]
     return position
-
-
-def read_index_file(descriptor):
-    """
-    Read a line in the index file
-
-    Input:
-        - descriptor: a file descriptor. Must point to the start
-        of the line
-
-    Ouput:
-        A tuple containing:
-        - timestamp: the timestamp of the current file
-        - current_sha1: the hash SHA1 of the current file
-        - sha1_hash_when_add: the hash SHA1 when the file is added
-        - sha1_hash_when_commit: the hash SHA1 when the file is committed
-        - file_relativepath: the relative path to the file from the current
-        directory
-    """
-    timestamp = os.read(descriptor, 14)
-    current_sha1_hash = os.read(descriptor, 41).decode().lstrip()
-    sha1_hash_when_add = os.read(descriptor, 41).decode().lstrip()
-    sha1_hash_when_commit, file_relativepath = read_commit_and_path(descriptor)
-    return (timestamp, current_sha1_hash, sha1_hash_when_add,
-            sha1_hash_when_commit, file_relativepath)
-
-
-def read_commit_and_path(descriptor):
-    """
-    Read the commit hash and relative path from index file or snapshot
-    object.
-
-    Input:
-        - descriptor: a file descriptor. Must point at the start of the
-        sha1 hash when commit
-
-    Output:
-        - sha1_hash_when_commit: the hash SHA1 when the file is committed
-        - file_relativepath: the relative path to the file from the current
-    """
-    sha1_hash_when_commit = os.read(descriptor, 41).decode().lstrip()
-    file_relativepath = ""
-    next_char = os.read(descriptor, 1).decode()
-    while next_char != "\n" and next_char != "":
-        next_char = os.read(descriptor, 1).decode()
-        file_relativepath += next_char
-    file_relativepath = file_relativepath.lstrip()
-    return sha1_hash_when_commit, file_relativepath
 
 
 def add_new_index(descriptor, time, file_sha1_hash, file_path):
@@ -122,8 +75,7 @@ def add_new_index(descriptor, time, file_sha1_hash, file_path):
 
 def update_file_index(descriptor, content, field):
     """
-    Update certain field on the index line of a file, then return the
-    descriptor back to the start of the line
+    Update certain field on the index line of a file
 
     Input:
         - descriptor: a file descriptor, must point to the start of the index
@@ -136,12 +88,11 @@ def update_file_index(descriptor, content, field):
     # of the line
     offsetDict = {0: 0, 1: 15, 2: 56, 3: 97, 4: 138}
     if not isinstance(content, bytes):
-        os.pwrite(descriptor, bytes(content, encoding="utf-8"),
-                  offsetDict[field])
+        os.lseek(descriptor, offsetDict[field], 1)
+        os.write(descriptor, bytes(content, encoding="utf-8"))
     else:
-        os.pwrite(descriptor, content,
-                  offsetDict[field])
-    os.lseek(descriptor, -(offsetDict[field] - len(content)), 1)
+        os.lseek(descriptor, offsetDict[field], 1)
+        os.write(descriptor, content)
 
 
 def read_certain_field_of_index(descriptor, field):
@@ -159,7 +110,7 @@ def read_certain_field_of_index(descriptor, field):
     # of the line
     offsetDict = {0: 0, 1: 15, 2: 56, 3: 97, 4: 138}
     length = {0: 14, 1: 40, 2: 40, 3: 40}
-    os.lseek(descriptor, offsetDict[field])
+    lseek(descriptor, offsetDict[field])
     if field != 4:
         return os.read(descriptor, length[field])
     else:
