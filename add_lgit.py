@@ -53,6 +53,10 @@ def add_file(current_path, parent_dir, descriptor, index_dict):
     time = convert_mtime_to_formatted_string(current_path)
     # If the file is already tracked, update it
     if current_path in index_dict.keys():
+        # If the file is already up to date, no need to rewrite.
+        if (time == index_dict[current_path][0]
+                and file_sha1_hash == index_dict[current_path][2]):
+            return
         # Move the file descriptor to the correct position
         lseek(descriptor, get_line_position(index_dict, current_path), 0)
         # Update the timestamp. current sha1 hash, add sha1 hash
@@ -77,14 +81,25 @@ def make_directory_and_object_file(file_sha1_hash, file_content, parent_dir):
         - file_content: the content of the file
         - parent_dir: the path to the lgit repository
     """
+    # Create a path for the new directory, which is the first 2 characters
+    # of the hash.
     new_dir_path = path.join(parent_dir, ".lgit/objects", file_sha1_hash[:2])
+    # Create the directory
     try:
         mkdir(new_dir_path)
     except FileExistsError:
         pass
     new_file_path = path.join(new_dir_path, file_sha1_hash[2:])
-    descriptor = open(new_file_path, "w+")
-    descriptor.write(file_content.decode())
+    # Create the new file
+    try:
+        new_file = open(new_file_path, "wb+")
+    except PermissionError:
+        print("Cannot add an object to a lgit repository")
+        return
+    if isinstance(file_content, bytes):
+        new_file.write(file_content)
+    else:
+        new_file.write(file_content.encode())
 
 
 def add_directory(current_path, parent_dir, path_list):
@@ -93,7 +108,6 @@ def add_directory(current_path, parent_dir, path_list):
     """
     try:
         for item in os.scandir(current_path):
-            print(path.join(current_path, item.name))
             path_list.append(path.join(current_path, item.name))
     except PermissionError:
         pass
