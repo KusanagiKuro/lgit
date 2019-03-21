@@ -5,15 +5,7 @@ from os import path
 from datetime import datetime
 
 
-def try_and_pass_function(function, error, *args, **kwargs):
-    try:
-        function(*args, **kwargs)
-        return True
-    except error:
-        return False
-
-
-def handle_path(name, parent_dir, absolute=False):
+def handle_path(name, parent_dir):
     """
     Return a relative path from a parent dir
     """
@@ -30,7 +22,6 @@ def read_and_hash(path, binary=False):
 
     Input:
         - path: the path of the file
-        - binary: will the return value in binary form or not
 
     Output:
         - The SHA1 hash code of the content, in binary form or normal form
@@ -45,10 +36,7 @@ def read_and_hash(path, binary=False):
     # Update it to the hash
     hash.update(file_content)
     # Return hash value
-    if binary:
-        return hash.digest(), file_content
-    else:
-        return hash.hexdigest(), file_content
+    return hash.hexdigest(), file_content
 
 
 def get_lgit_directory():

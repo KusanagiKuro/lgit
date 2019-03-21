@@ -135,7 +135,12 @@ def update_file_index(descriptor, content, field):
     # Dictionary contains the offset of each field, counting from the start
     # of the line
     offsetDict = {0: 0, 1: 15, 2: 56, 3: 97, 4: 138}
-    os.pwrite(descriptor, bytes(content, encoding="utf-8"), offsetDict[field])
+    if not isinstance(content, bytes):
+        os.pwrite(descriptor, bytes(content, encoding="utf-8"),
+                  offsetDict[field])
+    else:
+        os.pwrite(descriptor, content,
+                  offsetDict[field])
     os.lseek(descriptor, -(offsetDict[field] - len(content)), 1)
 
 

@@ -2,6 +2,9 @@
 from argparse import ArgumentParser
 from simple_lgit_functions import *
 from add_lgit import add_lgit
+from commit_lgit import commit_lgit
+from remove_lgit import remove_lgit
+from show_status_lgit import show_status_lgitcd
 from utility import get_lgit_directory
 
 
@@ -58,6 +61,9 @@ def main():
                             "status": show_status_lgit}
             # Pass the argument to the respective function to execute
             functionDict[args.command](args, parent_dir)
+        else:
+            print("fatal: Not a git repository (or any of",
+                  "the parent directories): .git")
 
 
 if __name__ == "__main__":
