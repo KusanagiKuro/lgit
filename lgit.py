@@ -1,6 +1,6 @@
 #!/usr/bin/env python3
 from argparse import ArgumentParser
-from lgit_functions import *
+from simple_lgit_functions import *
 from add_lgit import add_lgit
 from utility import get_lgit_directory
 
@@ -48,21 +48,16 @@ def main():
         init_lgit()
     else:
         parent_dir = get_lgit_directory()
-        if not parent_dir:
-            print("fatal: not a git directory",
-                  "(or any of the parentdirectories)")
-            return
-        functionDict = {"add": add_lgit,
-                        "rm": remove_lgit,
-                        "commit": commit_lgit,
-                        "config": config_lgit,
-                        "ls-files": list_files_lgit,
-                        "log": show_log_lgit,
-                        "status": show_status_lgit
-                        }
-        # Pass the argument to the respective function to execute
-        print(parent_dir)
-        functionDict[args.command](args, parent_dir)
+        if parent_dir:
+            functionDict = {"add": add_lgit,
+                            "rm": remove_lgit,
+                            "commit": commit_lgit,
+                            "config": config_lgit,
+                            "ls-files": list_files_lgit,
+                            "log": show_log_lgit,
+                            "status": show_status_lgit}
+            # Pass the argument to the respective function to execute
+            functionDict[args.command](args, parent_dir)
 
 
 if __name__ == "__main__":

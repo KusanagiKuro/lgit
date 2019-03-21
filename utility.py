@@ -2,13 +2,15 @@
 import os
 from hashlib import sha1
 from os import path
+from datetime import datetime
 
 
 def try_and_pass_function(function, error, *args, **kwargs):
     try:
         function(*args, **kwargs)
+        return True
     except error:
-        pass
+        return False
 
 
 def handle_path(name, parent_dir, absolute=False):
@@ -19,11 +21,10 @@ def handle_path(name, parent_dir, absolute=False):
         name = path.expanduser(name)
     else:
         name = path.abspath(name)
-    print(name)
     return path.relpath(name, parent_dir)
 
 
-def hash_file_content(path, binary=False):
+def read_and_hash(path, binary=False):
     """
     Hash a content of a file using SHA1
 
@@ -33,6 +34,7 @@ def hash_file_content(path, binary=False):
 
     Output:
         - The SHA1 hash code of the content, in binary form or normal form
+        - The content of the file
     """
     # Create the hash
     hash = sha1()
@@ -44,9 +46,9 @@ def hash_file_content(path, binary=False):
     hash.update(file_content)
     # Return hash value
     if binary:
-        return hash.digest()
+        return hash.digest(), file_content
     else:
-        return hash.hexdigest()
+        return hash.hexdigest(), file_content
 
 
 def get_lgit_directory():
@@ -58,6 +60,8 @@ def get_lgit_directory():
         if path.exists(dirpath + "/.lgit") and path.isdir(dirpath + "/.lgit"):
             return dirpath
         elif dirpath == "/":
+            print("fatal: not a git directory",
+                  "(or any of the parentdirectories)")
             return None
         else:
             dirpath = path.split(dirpath)[0]
@@ -74,5 +78,5 @@ def convert_mtime_to_formatted_string(current_path):
         - timestamp_string: the 14-character string represent year, month, day,
         hour, minute, second
     """
-    timestamp = path.getmtime(current_path)
-    return datetime.strftime("%Y%m%d%H%M%S", timestamp)
+    timestamp = datetime.fromtimestamp(path.getmtime(current_path))
+    return datetime.strftime(timestamp, "%Y%m%d%H%M%S")
