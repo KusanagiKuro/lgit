@@ -13,7 +13,7 @@ def handle_path(name, parent_dir):
         name = path.expanduser(name)
     else:
         name = path.abspath(name)
-    return path.relpath(name, parent_dir)
+    return path.relpath(name, ".")
 
 
 def read_and_hash(path):

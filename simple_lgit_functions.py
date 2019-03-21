@@ -51,6 +51,12 @@ def config_lgit(args, parent_dir):
 
 def list_files_lgit(args, parent_dir):
     index_dict = get_index_dictionary(parent_dir)
+    tracking_path_list = [parent_dir + "/" + infos[4]
+                          for infos in index_dict.values()
+                          if
+                          path.dirname(".") in parent_dir + "/" + infos[4]]
+    for file_path in tracking_path_list:
+        print(path.relpath(file_path))
 
 
 def show_log_lgit(args, parent_dir):
