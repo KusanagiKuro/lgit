@@ -74,9 +74,8 @@ def list_files_lgit(args, parent_dir):
     # dictionary
     tracking_path_list = [parent_dir + "/" + infos[4]
                           for infos in index_dict.values()
-                          if
-                          path.abspath(".") in
-                          path.dirname(parent_dir + "/" + infos[4])]
+                          if path.abspath(".")
+                          in path.dirname(parent_dir + "/" + infos[4])]
     # Print their path
     for file_path in tracking_path_list:
         print(path.relpath(file_path))
