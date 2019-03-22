@@ -5,6 +5,7 @@ from add_lgit import add_lgit
 from commit_lgit import commit_lgit
 from remove_lgit import remove_lgit
 from show_status_lgit import show_status_lgit
+from show_log_lgit import show_log_lgit
 from utility import get_lgit_directory
 
 
