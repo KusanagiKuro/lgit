@@ -22,7 +22,7 @@ def show_log_lgit(args, parent_dir):
         return dir_entry.stat().st_mtime
     # Get the list of commit files
     dir_entry_list = [dir_entry for dir_entry
-                      in os.scandir(parent_dir + "/.lgit/commits")
+                      in os.scandir("%s/.lgit/commits" % parent_dir)
                       if path.isfile(dir_entry.path)]
     # Sort these files by their modification time
     dir_entry_list.sort(key=get_mtime)
@@ -60,5 +60,6 @@ def print_log(dir_entry):
     print("commit", dir_entry.name)
     print("Author:", author)
     print("Date:", date, end="\n\n")
-    print("   " + content[3])
+    print(content[3])
+    print("    %s" % content[3])
     print()

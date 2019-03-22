@@ -13,7 +13,7 @@ def get_index_dictionary(parent_dir):
     Output:
         - index_dict: A dictionary, with key is the relative file path of the
         file, the value is a tuple contains its info inside the index file and
-        the length of the previous line.
+        the line's position.
     """
     # Open the index file
     try:
@@ -31,30 +31,12 @@ def get_index_dictionary(parent_dir):
                                 index_line[15:55],
                                 index_line[56:96],
                                 index_line[97:137],
-                                index_line[138:-1],
+                                index_line[138:].strip(),
                                 char_count))
         char_count += len(index_line)
     # Create the dictionary
     index_dict = {index_info[4]: index_info for index_info in index_info_list}
     return index_dict
-
-
-def get_line_position(index_dict, file_path):
-    """
-    Get the position of the line for that file path in the index file.
-
-    Input:
-        - index_dict: A dictionary returned by the get_index_dictionary
-        functions
-        - file_path: The relative path of the file from the lgit repository
-    """
-    position = 0
-    for index, key_name in enumerate(index_dict.keys()):
-        if key_name == file_path:
-            break
-        else:
-            position += index_dict[key_name][5]
-    return position
 
 
 def add_new_index(descriptor, time, file_sha1_hash, file_path):
@@ -87,36 +69,12 @@ def update_file_index(descriptor, content, field):
     # Dictionary contains the offset of each field, counting from the start
     # of the line
     offsetDict = {0: 0, 1: 15, 2: 56, 3: 97, 4: 138}
-    if not isinstance(content, bytes):
-        os.lseek(descriptor, offsetDict[field], 1)
-        os.write(descriptor, bytes(content, encoding="utf-8"))
-    else:
-        os.lseek(descriptor, offsetDict[field], 1)
-        os.write(descriptor, content)
-
-
-def read_certain_field_of_index(descriptor, field):
-    """
-    Read a certain field of the index line, then return the descriptor back to
-    the start of the line
-
-    Input:
-        - descriptor: a file descriptor, must point to the start of the index
-        line
-        - field: ranging from 0 to 5, represent which field will be read. 5
-        will be reading the whole line.
-    """
-    # Dictionary contains the offset of each field, counting from the start
-    # of the line
-    offsetDict = {0: 0, 1: 15, 2: 56, 3: 97, 4: 138}
-    length = {0: 14, 1: 40, 2: 40, 3: 40}
-    lseek(descriptor, offsetDict[field])
-    if field != 4:
-        return os.read(descriptor, length[field])
-    else:
-        file_path = os.read(descriptor, 1)
-        next_char = 1
-        while next_char != "\n" and next_char:
-            next_char = os.read(descriptor, 1)
-            file_path += next_char
-        return file_path
+    try:
+        if not isinstance(content, bytes):
+            os.lseek(descriptor, offsetDict[field], 1)
+            os.write(descriptor, bytes(content, encoding="utf-8"))
+        else:
+            os.lseek(descriptor, offsetDict[field], 1)
+            os.write(descriptor, content)
+    except TypeError:
+        print("fatal: updating files failed.")

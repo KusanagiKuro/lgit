@@ -5,7 +5,7 @@ from os import path
 from datetime import datetime
 
 
-def handle_path(name, parent_dir):
+def handle_path(name):
     """
     Return a relative path from a parent dir
     """
@@ -16,12 +16,14 @@ def handle_path(name, parent_dir):
     return path.relpath(name, ".")
 
 
-def read_and_hash(path):
+def read_and_hash(file_path, is_content_needed=True):
     """
     Hash a content of a file using SHA1
 
     Input:
-        - path: the path of the file
+        - file_path: the path of the file
+        - is_content_needed: a boolean that decide whether the content needs to
+        be returned.
 
     Output:
         - The SHA1 hash code of the content, in binary form or normal form
@@ -30,13 +32,20 @@ def read_and_hash(path):
     # Create the hash
     hash = sha1()
     # Open and read file content
-    file = open(path, "rb")
+    try:
+        file = open(file_path, "rb")
+    except PermissionError:
+        print("error: open(\"%s\"): PermissionDenied" % file_path)
+        return None, None
     file_content = file.read()
     file.close()
     # Update it to the hash
     hash.update(file_content)
-    # Return hash value
-    return hash.hexdigest(), file_content
+    # Return hash value and content if needed
+    if is_content_needed:
+        return hash.hexdigest(), file_content
+    else:
+        return hash.hexdigest()
 
 
 def get_lgit_directory():
@@ -49,7 +58,7 @@ def get_lgit_directory():
             return dirpath
         elif dirpath == "/":
             print("fatal: not a git directory",
-                  "(or any of the parentdirectories)")
+                  "(or any of the parent directories)")
             return None
         else:
             dirpath = path.split(dirpath)[0]

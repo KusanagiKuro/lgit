@@ -64,16 +64,19 @@ def create_commit_object(commit_name, author, message, parent_dir):
         - message: the message for the commit
         - parent_dir: the path to the lgit repository
     """
-    new_object_path = parent_dir + "/.lgit/commits/" + commit_name
+    # The path for the new commit object
+    new_object_path = "%s/.lgit/commits/%s" % (parent_dir, commit_name)
     try:
-        descriptor = os.open(new_object_path, O_CREAT | O_WRONLY)
+        commit_file = open(new_object_path, "w+")
     except PermissionError:
-        print("Failed to add an object to lgit repository")
+        add_object_permision_error()
         return
-    time = commit_name.split(".")[0]
-    text = "\n".join([author, time, "", message[0]])
-    os.write(descriptor, bytes(text, encoding="utf-8"))
-    os.close(descriptor)
+    # The commit time
+    commit_time = commit_name.split(".")[0]
+    # The text that will be written on the commit object
+    text = "\n".join([author, commit_time, "", message[0]])
+    commit_file.write(text)
+    commit_file.close()
 
 
 def create_snapshot_object(commit_name, content, parent_dir):
@@ -85,12 +88,14 @@ def create_snapshot_object(commit_name, content, parent_dir):
         - content: the content that will be written on the snapshot
         - parent_dir: the path to the lgit repository
     """
-    new_object_path = parent_dir + "/.lgit/snapshots/" + commit_name
+    # The path for the new snapshot object
+    new_object_path = "%s/.lgit/snapshots/%s" % (parent_dir, commit_name)
     try:
-        descriptor = os.open(new_object_path, O_CREAT | O_WRONLY)
+        snapshot_file = open(new_object_path, "w+")
     except PermissionError:
-        print("Failed to add an object to lgit repository")
+        add_object_permision_error()
         return
     text = "\n".join(content)
-    os.write(descriptor, bytes(text, encoding="utf-8"))
-    os.close(descriptor)
+    # Write the content
+    snapshot_file.write(text)
+    snapshot_file.close()

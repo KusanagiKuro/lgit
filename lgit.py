@@ -21,10 +21,10 @@ def createParser():
     init_parser = subparsers.add_parser("init")
     # Create a subparser for add command
     add_parser = subparsers.add_parser("add")
-    add_parser.add_argument("filenames", nargs="+")
+    add_parser.add_argument("filenames", nargs="+", type=str)
     # Create a subparser for remove command
     remove_parser = subparsers.add_parser("rm")
-    remove_parser.add_argument("filenames", nargs="+")
+    remove_parser.add_argument("filenames", nargs="+", type=str)
     # Create a subparser for commit command
     commit_parser = subparsers.add_parser("commit")
     commit_parser.add_argument("-m", dest="message", nargs=1, required=True)
