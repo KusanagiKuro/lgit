@@ -37,6 +37,9 @@ def read_and_hash(file_path, is_content_needed=True):
     except PermissionError:
         print("error: open(\"%s\"): PermissionDenied" % file_path)
         return None, None
+    except NotADirectoryError:
+        print("error: open(\"%s\"): NotADirectoryError" % file_path)
+        return None, None
     file_content = file.read()
     file.close()
     # Update it to the hash
