@@ -33,7 +33,6 @@ def changes_not_staged_for_commit(index_dict):
 
 
 def list_all_in(path, og_cwd, list_files=[]):
-    print("path", path)
     for file in os.listdir(path):
         if path == og_cwd:
             list_files.append(file)
