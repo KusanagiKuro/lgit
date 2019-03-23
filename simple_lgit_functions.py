@@ -12,11 +12,8 @@ def init_lgit(init_path="."):
     # Create lgit directory
     try:
         mkdir(".lgit")
-        print("Initialize empty lgit repository in",
-              path.join(current_dir_path, ".lgit"))
     except FileExistsError:
-        print("Reinitialized existing Git repository in",
-              path.join(current_dir_path, ".lgit"))
+        print("Git repository already initialized.")
         pass
     except PermissionError:
         print(current_dir_path + "/.lgit: PermissionDenied")
@@ -55,8 +52,8 @@ def config_lgit(args, parent_dir):
         config_file = open(config_file_path, "w+")
         # Write the new author's name to the config file
         config_file.write(args.author)
-    except PermissionDenied:
-        print("Unable to access", config_file_path)
+    except PermissionError:
+        return
 
 
 def list_files_lgit(args, parent_dir):
@@ -81,5 +78,6 @@ def list_files_lgit(args, parent_dir):
                           in path.dirname("%s/%s" % (parent_dir, infos[4]))
                           and path.isfile("%s/%s" % (parent_dir, infos[4]))]
     # Print their path
+    tracking_path_list.sort()
     for file_path in tracking_path_list:
         print(path.relpath(file_path))

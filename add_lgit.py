@@ -20,7 +20,7 @@ def add_lgit(args, parent_dir):
     path_list = [handle_path(name) for name in args.filenames[::-1]]
     # Get the infos from the index file
     index_dict = get_index_dictionary(parent_dir)
-    if not index_dict:
+    if index_dict is None:
         return
     # Create a file descriptor for index file
     index_file_path = path.join(parent_dir, ".lgit/index")
@@ -28,7 +28,6 @@ def add_lgit(args, parent_dir):
     while path_list:
         # Pop each path and execute the fitting function
         current_path = path_list.pop()
-        print(path.exists(current_path))
         # If the path doesn't exist, print an error message
         if not path.exists(current_path):
             pathspec_error(current_path)
@@ -58,7 +57,8 @@ def add_file(current_path, parent_dir, descriptor, index_dict):
     # Convert the modification time of the file to string
     mtime = convert_mtime_to_formatted_string(current_path)
     # Get the relative path from the repository
-    rel_path_from_repository = path.relpath(current_path, parent_dir)
+    rel_path_from_repository = path.relpath(path.abspath(current_path),
+                                            parent_dir)
     try:
         update_info_when_add(descriptor, rel_path_from_repository,
                              mtime, file_sha1_hash, index_dict)
@@ -66,8 +66,8 @@ def add_file(current_path, parent_dir, descriptor, index_dict):
         print("error: unable to index file %s" % path.basename(current_path))
     # Create the new directory + object file in objects if needed
     make_directory_and_object_file(file_sha1_hash, file_content, parent_dir)
-    # Return the file descriptor to the start of the index file.
-    lseek(descriptor, 0, 0)
+    # # Return the file descriptor to the start of the index file.
+    # lseek(descriptor, 0, 0)
 
 
 def update_info_when_add(descriptor, rel_path_from_repository,

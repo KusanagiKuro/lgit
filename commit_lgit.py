@@ -75,7 +75,7 @@ def create_commit_object(commit_name, author, message, parent_dir):
     commit_time = commit_name.split(".")[0]
     # The text that will be written on the commit object
     text = "\n".join([author, commit_time, "", message[0]])
-    commit_file.write(text)
+    commit_file.write(text + "\n")
     commit_file.close()
 
 
@@ -97,5 +97,5 @@ def create_snapshot_object(commit_name, content, parent_dir):
         return
     text = "\n".join(content)
     # Write the content
-    snapshot_file.write(text)
+    snapshot_file.write(text + "\n")
     snapshot_file.close()

@@ -52,16 +52,17 @@ def get_lgit_directory():
     """
     Get the closest directory that has a .lgit directory in it.
     """
-    dirpath = path.abspath(".")
+    dir_path = os.getcwd()
     while True:
-        if path.exists(dirpath + "/.lgit") and path.isdir(dirpath + "/.lgit"):
-            return dirpath
-        elif dirpath == "/":
-            print("fatal: not a git directory",
+        if (path.exists(dir_path + "/.lgit")
+                and path.isdir(dir_path + "/.lgit")):
+            return dir_path
+        elif dir_path == "/":
+            print("fatal: not a git repository",
                   "(or any of the parent directories)")
             return None
         else:
-            dirpath = path.split(dirpath)[0]
+            dir_path = path.dirname(dir_path)
 
 
 def convert_mtime_to_formatted_string(current_path):

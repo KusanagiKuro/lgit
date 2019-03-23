@@ -11,12 +11,13 @@ def remove_lgit(args, parent_dir):
     path_list = [handle_path(name) for name in args.filenames[::-1]]
     # Get the infos from the index file
     index_dict = get_index_dictionary(parent_dir)
+    if index_dict is None:
+        return
     # The list contains removed_files
     removed_files = []
     # Pop each path out of the list and process it.
     while path_list and index_dict:
         current_path = path_list.pop()
-        print(current_path)
         if not path.exists(current_path):
             pathspec_error(current_path)
         elif path.isfile(current_path):
@@ -44,8 +45,8 @@ def remove_file(file_path, parent_dir, index_dict):
         - The relative path of the removed file from the lgit repository
     """
     # The relative path of the file from the lgit repository
-    rel_path_from_repository = path.relpath(path.abspath(file_path), parent_dir)
-    print(rel_path_from_repository)
+    rel_path_from_repository = path.relpath(path.abspath(file_path),
+                                            parent_dir)
     if check_error_when_removing(file_path, index_dict,
                                  rel_path_from_repository):
         return None
@@ -69,7 +70,6 @@ def check_error_when_removing(file_path, index_dict, rel_path_from_repository):
         the lgit repository
     """
     # If the file path isn't in index, raise error
-    print(index_dict.keys())
     if rel_path_from_repository not in index_dict.keys():
         pathspec_error(file_path)
         return True
@@ -121,5 +121,5 @@ def rewrite_index_file(removed_files, index_dict, parent_dir):
                                    in index_dict.items()
                                    if rel_path not in removed_files])
     index_file = open("%s/.lgit/index" % parent_dir, "w")
-    index_file.write(new_index_content)
+    index_file.write(new_index_content + "\n")
     index_file.close()

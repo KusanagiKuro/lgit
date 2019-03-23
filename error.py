@@ -9,7 +9,7 @@ def pathspec_error(file_path):
     Input:
         - file_path: The file path that is causing the error
     """
-    print("fatal: '%s' did not match any files" % file_path)
+    print("fatal: pathspec '%s' did not match any files" % file_path)
     return
 
 

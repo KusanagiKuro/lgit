@@ -60,6 +60,5 @@ def print_log(dir_entry):
     print("commit", dir_entry.name)
     print("Author:", author)
     print("Date:", date, end="\n\n")
-    print(content[3])
     print("    %s" % content[3])
     print()

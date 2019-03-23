@@ -3,12 +3,13 @@ import os
 from os import path, O_RDWR, O_CREAT, O_WRONLY
 from index_related_funcs import *
 from datetime import datetime
+from utility import *
 
 
 def none_commit(index_dict):
     no_commit = True
     count = 0
-    for index in index_dict:
+    for index in index_dict.values():
         if ' ' not in index[3]:
             no_commit = False
             break
@@ -17,7 +18,7 @@ def none_commit(index_dict):
 
 def changes_to_be_commit(index_dict):
     changed_file_list_cm = []
-    for index in index_dict:
+    for index in index_dict.keys():
         if index_dict[index][2] != index_dict[index][3]:
             changed_file_list_cm.append(index)
     return changed_file_list_cm
@@ -25,7 +26,7 @@ def changes_to_be_commit(index_dict):
 
 def changes_not_staged_for_commit(index_dict):
     changed_file_list_not_cm = []
-    for index in index_dict:
+    for index in index_dict.keys():
         if index_dict[index][2] != index_dict[index][1]:
             changed_file_list_not_cm.append(index)
     return changed_file_list_not_cm
@@ -38,7 +39,6 @@ def list_all_in(path, og_cwd, list_files=[]):
         else:
             list_files.append(path + '/' + file)
     for folder in list_files:
-        list_all_in(path, og_cwd, list_files=[])
         if os.path.isdir(folder):
             if folder == '.lgit':
                 list_files.remove(folder)
@@ -59,20 +59,37 @@ def check_untracked_files(list_files, index_dict):
     return untracked_files
 
 
+def apply_change_on_index(index_dict, parent_dir):
+    try:
+        descriptor = os.open("%s/.lgit/index" % parent_dir,
+                             os.O_RDWR | os.O_CREAT)
+    except PermissionError:
+        pathspec_error("%s/.lgit/index" % parent_dir)
+        return
+    for file_path, infos in index_dict.items():
+        rel_path_from_repository = "%s/%s" % (parent_dir, file_path)
+        file_sha1_hash = read_and_hash(rel_path_from_repository, False)
+        mtime = convert_mtime_to_formatted_string(rel_path_from_repository)
+        lseek(descriptor, infos[5], 0)
+        update_file_index(descriptor, " ".join([mtime, file_sha1_hash]), 0)
+
+
 def show_status_lgit(args, parent_dir):
-    og_cwd = os.getcwd()
-    list_files = list_all_in(parent_dir, og_cwd)
+    list_files = list_all_in(parent_dir, parent_dir)
     index_dict = get_index_dictionary(parent_dir)
+    apply_change_on_index(index_dict, parent_dir)
     print('On branch master')
     if none_commit(index_dict):
         print('\nNo commits yet\n')
-    if changes_to_be_commit(index_dict):
+    changed_file_list_cm = changes_to_be_commit(index_dict)
+    if changed_file_list_cm:
         print('Changes to be committed:')
         print('  (use "./lgit.py reset HEAD ..." to unstage)\n')
         for file in changed_file_list_cm:
             print('     modified:', file)
         print('\n')
-    if changes_not_staged_for_commit(index_dict):
+    changed_file_list_not_cm = changes_not_staged_for_commit(index_dict)
+    if changed_file_list_not_cm:
         print('Changes not staged for commit:')
         print('  (use "./lgit.py add ..." to update what will be committed)')
         print('  (use "./lgit.py checkout -- ..."', end='')
@@ -80,12 +97,13 @@ def show_status_lgit(args, parent_dir):
         for file in changed_file_list_not_cm:
             print('     modified:', file)
         print('\n')
-    if check_untracked_files(list_files, index_dict):
+    untracked_files = check_untracked_files(list_files, index_dict)
+    if untracked_files:
         print('Untracked files:')
         print('  (use "./lgit.py add <file>..." to ', end='')
         print('include in what will be committed)\n')
         for file in untracked_files:
-            print('     '+file)
+            print("    ", file)
         print('\n')
         print('nothing added to commit but untracked files present ', end='')
         print('(use "./lgit.py add" to track)')
