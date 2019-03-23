@@ -22,7 +22,7 @@ def remove_lgit(args, parent_dir):
         if not exists(current_path):
             pathspec_error(current_path)
         elif isfile(current_path):
-            remove_file(current_path, parent_dir, index_dict, removed_file)
+            remove_file(current_path, parent_dir, index_dict, removed_files)
         else:
             print("fatal: not removing '%s' recursively without -r"
                   % current_path)
@@ -31,7 +31,7 @@ def remove_lgit(args, parent_dir):
         rewrite_index_file(removed_files, index_dict, parent_dir)
 
 
-def remove_file(file_path, parent_dir, index_dict, removed_file):
+def remove_file(file_path, parent_dir, index_dict, removed_files):
     """
     Remove a file from the index
 
@@ -40,7 +40,7 @@ def remove_file(file_path, parent_dir, index_dict, removed_file):
         - index_dict: the dictionary contains all the infos inside the index
         file.
         - parent_dir: the directory that contains the lgit repository
-        - removed_file: the list contains all previously removed files.
+        - removed_files: the list contains all previously removed files.
     """
     # The relative path of the file from the lgit repository
     rel_path_from_repository = relpath(abspath(file_path), parent_dir)
@@ -54,7 +54,7 @@ def remove_file(file_path, parent_dir, index_dict, removed_file):
     except PermissionError:
         print("fatal: lgit rm: '%s': Permission denied")
     # Add the removed file to the list
-    removed_file.append(rel_path_from_repository)
+    removed_files.append(rel_path_from_repository)
     return
 
 
