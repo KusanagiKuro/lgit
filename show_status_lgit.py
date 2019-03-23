@@ -33,6 +33,7 @@ def changes_not_staged_for_commit(index_dict):
 
 
 def list_all_in(path, og_cwd, list_files=[]):
+    print("path", path)
     for file in os.listdir(path):
         if path == og_cwd:
             list_files.append(file)
@@ -68,7 +69,10 @@ def apply_change_on_index(index_dict, parent_dir):
         return
     for file_path, infos in index_dict.items():
         rel_path_from_repository = "%s/%s" % (parent_dir, file_path)
-        file_sha1_hash = read_and_hash(rel_path_from_repository, False)
+        try:
+            file_sha1_hash = read_and_hash(rel_path_from_repository, False)
+        except FileNotFoundError:
+            pass
         mtime = convert_mtime_to_formatted_string(rel_path_from_repository)
         lseek(descriptor, infos[5], 0)
         update_file_index(descriptor, " ".join([mtime, file_sha1_hash]), 0)
