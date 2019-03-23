@@ -1,6 +1,7 @@
 #!/usr/bin/env python3
 import os
 from os import lseek, pwrite, path
+from os.path import join
 
 
 def get_index_dictionary(parent_dir):
@@ -17,7 +18,7 @@ def get_index_dictionary(parent_dir):
     """
     # Open the index file
     try:
-        index_file = open(path.join(parent_dir, ".lgit/index"), "r+")
+        index_file = open(join(parent_dir, ".lgit/index"), "r+")
     except PermissionError as e:
         print(e.filename + ":", "index file open failed: PermissionDenied")
         return None
@@ -71,10 +72,10 @@ def update_file_index(descriptor, content, field):
     offsetDict = {0: 0, 1: 15, 2: 56, 3: 97, 4: 138}
     try:
         if not isinstance(content, bytes):
-            os.lseek(descriptor, offsetDict[field], 1)
+            lseek(descriptor, offsetDict[field], 1)
             os.write(descriptor, bytes(content, encoding="utf-8"))
         else:
-            os.lseek(descriptor, offsetDict[field], 1)
+            lseek(descriptor, offsetDict[field], 1)
             os.write(descriptor, content)
     except TypeError:
         print("fatal: updating files failed.")

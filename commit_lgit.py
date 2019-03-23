@@ -24,7 +24,6 @@ def commit_lgit(args, parent_dir):
     content = config_file.readlines()
     if not content:
         # If it is empty, the commit shouldn't happen.
-        print("Can't commit without author's name")
         return
     author = content[0].strip()
     config_file.close()

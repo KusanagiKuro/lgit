@@ -1,20 +1,20 @@
 #!/usr/bin/env python3
 import os
 from index_related_funcs import *
-from os import mkdir, environ, path
+from os import mkdir, environ, path, getcwd
+from os.path import join, dirname, isfile, relpath
 
 
-def init_lgit(init_path="."):
+def init_lgit():
     """
     Initialize the directories structure
     """
-    current_dir_path = path.abspath(init_path)
+    current_dir_path = getcwd()
     # Create lgit directory
     try:
         mkdir(".lgit")
     except FileExistsError:
         print("Git repository already initialized.")
-        pass
     except PermissionError:
         print(current_dir_path + "/.lgit: PermissionDenied")
         return
@@ -25,13 +25,13 @@ def init_lgit(init_path="."):
     dir_path_list = [".lgit/objects", ".lgit/commits", ".lgit/snapshots"]
     for dir_path in dir_path_list:
         try:
-            mkdir(path.join(current_dir_path, dir_path))
+            mkdir(join(current_dir_path, dir_path))
         except FileExistsError:
             pass
     # Create index file
-    index = open(path.join(current_dir_path, ".lgit/index"), "w+")
+    index = open(join(current_dir_path, ".lgit/index"), "w+")
     # Create config file, write the user name on it
-    config = open(path.join(current_dir_path, ".lgit/config"), "w+")
+    config = open(join(current_dir_path, ".lgit/config"), "w+")
     # Write the username to the config file
     config.write(environ.get("LOGNAME"))
     index.close()
@@ -51,7 +51,7 @@ def config_lgit(args, parent_dir):
     try:
         config_file = open(config_file_path, "w+")
         # Write the new author's name to the config file
-        config_file.write(args.author)
+        config_file.write(args.author[0])
     except PermissionError:
         return
 
@@ -74,10 +74,10 @@ def list_files_lgit(args, parent_dir):
     # dictionary
     tracking_path_list = ["%s/%s" % (parent_dir, infos[4])
                           for infos in index_dict.values()
-                          if path.abspath(".")
-                          in path.dirname("%s/%s" % (parent_dir, infos[4]))
-                          and path.isfile("%s/%s" % (parent_dir, infos[4]))]
+                          if getcwd()
+                          in dirname("%s/%s" % (parent_dir, infos[4]))
+                          and isfile("%s/%s" % (parent_dir, infos[4]))]
     # Print their path
     tracking_path_list.sort()
     for file_path in tracking_path_list:
-        print(path.relpath(file_path))
+        print(relpath(file_path))
