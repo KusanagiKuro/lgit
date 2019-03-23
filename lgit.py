@@ -61,6 +61,9 @@ def main():
                             "status": show_status_lgit}
             # Pass the argument to the respective function to execute
             functionDict[args.command](args, parent_dir)
+        else:
+            print("fatal: not a git repository",
+                  "(or any of the parent directories)")
 
 
 if __name__ == "__main__":

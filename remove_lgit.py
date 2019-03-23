@@ -77,15 +77,6 @@ def check_error_when_removing(file_path, index_dict, rel_path_from_repository):
     infos = index_dict[rel_path_from_repository]
     # Read the file content and its hash
     file_sha1_hash = read_and_hash(file_path, False)
-    # Raise error if the file isn't added or commited
-    if file_sha1_hash != infos[2]:
-        local_modification_error(file_path)
-        return True
-    if file_sha1_hash != infos[3]:
-        changes_stage_in_index_error(file_path)
-        return True
-    # Print a message indicate the removal is a success
-    print("rm '%s'" % file_path)
     return False
 
 
