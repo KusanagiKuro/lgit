@@ -25,7 +25,8 @@ def remove_lgit(args, parent_dir):
             if removed_file:
                 removed_files.append(removed_file)
         else:
-            print("fatal: not removing \'%s\' recursively without -r")
+            print("fatal: not removing '%s' recursively without -r"
+                  % current_path)
     # Rewrite the index file if there is any file that got removed
     if removed_files:
         rewrite_index_file(removed_files, index_dict, parent_dir)

@@ -10,7 +10,7 @@ def init_lgit():
     Initialize the directories structure
     """
     current_dir_path = getcwd()
-    # Create lgit directory
+    # Create lgit directory in the current directory
     try:
         mkdir(".lgit")
     except FileExistsError:
@@ -21,7 +21,7 @@ def init_lgit():
     except FileNotFoundError:
         print("Cannot find", current_dir_path)
         return
-    # Dictionary contains all the other paths for the directory structure
+    # List contains all the other paths for the directory structure
     dir_path_list = [".lgit/objects", ".lgit/commits", ".lgit/snapshots"]
     for dir_path in dir_path_list:
         try:

@@ -4,7 +4,7 @@ from os import path, O_RDWR, O_CREAT, O_WRONLY, listdir
 from os.path import join, isdir
 from index_related_funcs import *
 from datetime import datetime
-from utility import *
+from utility import read_and_hash, convert_mtime_to_formatted_string
 
 
 def has_any_commit(parent_dir):
@@ -35,10 +35,8 @@ def list_all_in(dir_path, parent_dir, list_files=[]):
             list_files.append(dir_path + '/' + file)
     for folder in list_files:
         if isdir(folder):
-            if folder == '.lgit':
-                list_files.remove(folder)
-            else:
-                list_files.remove(folder)
+            list_files.remove(folder)
+            if folder != '.lgit':
                 list_all_in(folder, parent_dir, list_files)
     return list_files
 
