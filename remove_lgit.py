@@ -45,7 +45,8 @@ def remove_file(file_path, parent_dir, index_dict, removed_files):
     # The relative path of the file from the lgit repository
     rel_path_from_repository = relpath(abspath(file_path), parent_dir)
     # Check for the error
-    if check_error_when_removing(index_dict, rel_path_from_repository):
+    if check_error_when_removing(index_dict, rel_path_from_repository,
+                                 file_path):
         return
     # Delete the original file and recursively delete its parent directory if
     # they are empty
@@ -58,7 +59,7 @@ def remove_file(file_path, parent_dir, index_dict, removed_files):
     return
 
 
-def check_error_when_removing(index_dict, rel_path_from_repository):
+def check_error_when_removing(index_dict, rel_path_from_repository, file_path):
     """
     Check if the process of removing file has any error
 
