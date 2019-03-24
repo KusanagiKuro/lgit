@@ -25,7 +25,7 @@ def commit_lgit(args, parent_dir):
     if not content:
         # If it is empty, the commit shouldn't happen.
         return
-    author = content[0].strip()
+    author = content[0].rstrip()
     config_file.close()
     # Read the index file
     index_dict = get_index_dictionary(parent_dir)

@@ -7,6 +7,7 @@ from remove_lgit import remove_lgit
 from show_status_lgit import show_status_lgit
 from show_log_lgit import show_log_lgit
 from utility import get_lgit_directory
+from list_files_lgit import list_files_lgit
 
 
 def createParser():

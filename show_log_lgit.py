@@ -1,7 +1,8 @@
 #!/usr/bin/env python3
 import os
 from datetime import datetime
-from os import path
+from os import path, scandir
+from os.path import isfile, join
 
 
 def show_log_lgit(args, parent_dir):
@@ -17,13 +18,13 @@ def show_log_lgit(args, parent_dir):
         Get the modification time of a directory entry
 
         Input:
-            - dir_entry: A DirEntry object of the commit object
+            - dir_entry: A DirEntry object returned by os.scandir
         """
         return dir_entry.stat().st_mtime
     # Get the list of commit files
     dir_entry_list = [dir_entry for dir_entry
-                      in os.scandir("%s/.lgit/commits" % parent_dir)
-                      if path.isfile(dir_entry.path)]
+                      in scandir(join(parent_dir, ".lgit/commits"))
+                      if isfile(dir_entry.path)]
     # Sort these files by their modification time
     dir_entry_list.sort(key=get_mtime)
     # Print the log for each commit file
@@ -44,7 +45,7 @@ def print_log(dir_entry):
         commit_file = open(dir_entry.path, "r")
         content = commit_file.readlines()
         # Get author name
-        author = content[0].strip()
+        author = content[0].rstrip()
         # Get the time from commit file and reformat it
         datetime_text = " ".join([content[1][:4],
                                   content[1][4:6],
@@ -57,8 +58,9 @@ def print_log(dir_entry):
     except PermissionError:
         return
     # Print all the infos
-    print("commit", dir_entry.name)
-    print("Author:", author)
-    print("Date:", date, end="\n\n")
-    print("    %s" % content[3])
-    print()
+    print("""commit %s
+Author: %s author)
+Date: %s date
+
+    %s
+""" % (dir_entry.name, author, date, content[3]))

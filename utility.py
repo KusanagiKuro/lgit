@@ -7,12 +7,10 @@ from datetime import datetime
 
 def handle_path(name):
     """
-    Return a relative path from a parent dir
+    Return a relative path from the current directory
     """
     if name.startswith("~"):
         name = path.expanduser(name)
-    else:
-        name = path.abspath(name)
     return path.relpath(name, ".")
 
 

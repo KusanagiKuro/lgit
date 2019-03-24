@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 import os
-from os import path, O_RDWR, O_CREAT, O_WRONLY, listdir
-from os.path import join, isdir
+from os import path, O_RDWR, O_CREAT, O_WRONLY, listdir, getcwd
+from os.path import join, isdir, isfile, relpath
 from index_related_funcs import *
 from datetime import datetime
 from utility import read_and_hash, convert_mtime_to_formatted_string
@@ -12,38 +12,57 @@ def has_any_commit(parent_dir):
 
 
 def get_status_lst(list_files, index_dict):
-    in_commit_list = []
-    not_in_commit_list = []
-    untracked_list = []
-    for file_path in index_dict.keys():
-        if index_dict[file_path][2] == index_dict[file_path][3]:
-            in_commit_list.append(file_path)
-        else:
-            not_in_commit_list.append(file_path)
-    for file_path in list_files:
-        if (file_path not in index_dict.keys() or
-                index_dict[file_path][1] != index_dict[file_path][2]):
-            untracked_list.append(file_path)
+    """
+    Get the lists that contains file paths for changes to be commit, changes
+    not in commit and untracked file for status command.
+
+    Input:
+        - list_files: List of files in current working directory
+        - index_dict: the dictionary contains all the infos inside the index
+        file.
+    """
+    # List of files that are added but havent been committed
+    in_commit_list = [file_path for file_path in index_dict.keys()
+                      if index_dict[file_path][2] != index_dict[file_path][3]]
+    # List of files that have local modification but haven't been added
+    not_in_commit_list = [file_path for file_path in index_dict.keys()
+                          if
+                          index_dict[file_path][1] != index_dict[file_path][2]]
+    # List of untracked files.
+    untracked_list = [file_path for file_path in list_files
+                      if file_path not in index_dict.keys()]
     return in_commit_list, not_in_commit_list, untracked_list
 
 
 def list_all_in(dir_path, parent_dir, list_files=[]):
+    """
+    Recursively add a folder and all its child to the list of files.
+
+    Input:
+        - dir_path: the path of the current directory
+        - parent_dir: the path of the lgit repository
+        - list_files: The list that will be returned
+    """
+    # Iterate through the names of files inside the current directory
     for file in listdir(dir_path):
+        # Create the relative path from lgit repository to the directory entry
         if dir_path == parent_dir:
-            list_files.append(file)
+            rel_path_from_repository = relpath(file, parent_dir)
         else:
-            list_files.append(dir_path + '/' + file)
-    for folder in list_files:
-        if isdir(folder):
-            list_files.remove(folder)
-            if folder != '.lgit':
-                list_all_in(folder, parent_dir, list_files)
+            rel_path_from_repository = relpath(join(dir_path, file),
+                                               parent_dir)
+        # If it's a file, add it to the returned file list, otherwise,
+        # apply this function on that folder if it's not the .lgit folder.
+        if isfile(join(parent_dir, rel_path_from_repository)):
+            list_files.append(rel_path_from_repository)
+        elif not rel_path_from_repository.startswith(".lgit"):
+            list_all_in(join(dir_path, file), parent_dir, list_files)
     return list_files
 
 
 def apply_change_on_index(index_dict, parent_dir):
     try:
-        descriptor = os.open("%s/.lgit/index" % parent_dir,
+        descriptor = os.open(join(parent_dir, ".lgit/index"),
                              os.O_RDWR | os.O_CREAT)
     except PermissionError:
         pathspec_error("%s/.lgit/index" % parent_dir)
@@ -121,7 +140,7 @@ Untracked files:
 
 
 def show_status_lgit(args, parent_dir):
-    list_files = list_all_in(parent_dir, parent_dir)
+    list_files = list_all_in(getcwd(), parent_dir)
     index_dict = get_index_dictionary(parent_dir)
     apply_change_on_index(index_dict, parent_dir)
     index_dict = get_index_dictionary(parent_dir)

@@ -34,6 +34,7 @@ def add_lgit(args, parent_dir):
             pathspec_error(current_path)
         elif basename(current_path) == ".lgit":
             continue
+        # elif current_path.startswith("..")
         elif isfile(current_path):
             add_file(current_path, parent_dir, descriptor, index_dict)
         elif isdir(current_path):
@@ -63,11 +64,10 @@ def add_file(current_path, parent_dir, descriptor, index_dict):
         update_info_when_add(descriptor, rel_path_from_repository,
                              mtime, file_sha1_hash, index_dict)
     except TypeError:
+        # Raise error when the hash and file content are None.
         print("error: unable to index file %s" % basename(current_path))
     # Create the new directory + object file in objects if needed
     make_directory_and_object_file(file_sha1_hash, file_content, parent_dir)
-    # # Return the file descriptor to the start of the index file.
-    # lseek(descriptor, 0, 0)
 
 
 def update_info_when_add(descriptor, rel_path_from_repository,
@@ -97,6 +97,7 @@ def update_info_when_add(descriptor, rel_path_from_repository,
         update_file_index(descriptor, " ".join([mtime,
                                                 file_sha1_hash,
                                                 file_sha1_hash]), 0)
+    # Else add a new index line.
     else:
         lseek(descriptor, 0, 2)
         add_new_index(descriptor, mtime, file_sha1_hash,
@@ -122,7 +123,8 @@ def make_directory_and_object_file(file_sha1_hash, file_content, parent_dir):
         except FileExistsError:
             pass
         new_file_path = join(new_dir_path, file_sha1_hash[2:])
-        # Create the new file
+        # Create the new file and write the content of the original file into
+        # it
         try:
             new_file = open(new_file_path, "wb+")
         except PermissionError:
@@ -130,6 +132,7 @@ def make_directory_and_object_file(file_sha1_hash, file_content, parent_dir):
             return
         new_file.write(file_content)
     except TypeError:
+        # Raise error if the sha1 hash is empty
         print("fatal: updating files failed")
 
 
