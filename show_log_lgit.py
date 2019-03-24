@@ -3,6 +3,7 @@ import os
 from datetime import datetime
 from os import path, scandir
 from os.path import isfile, join
+from utility import get_mtime
 
 
 def show_log_lgit(args, parent_dir):
@@ -13,14 +14,6 @@ def show_log_lgit(args, parent_dir):
         - args: the arguments that were parsed by the parser
         - parent_dir: the directory that contains the lgit repository
     """
-    def get_mtime(dir_entry):
-        """
-        Get the modification time of a directory entry
-
-        Input:
-            - dir_entry: A DirEntry object returned by os.scandir
-        """
-        return dir_entry.stat().st_mtime
     # Get the list of commit files
     dir_entry_list = [dir_entry for dir_entry
                       in scandir(join(parent_dir, ".lgit/commits"))

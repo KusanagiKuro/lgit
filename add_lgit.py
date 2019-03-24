@@ -32,9 +32,8 @@ def add_lgit(args, parent_dir):
         # If the path doesn't exist, print an error message
         if not exists(current_path):
             pathspec_error(current_path)
-        elif basename(current_path) == ".lgit":
+        elif basename(current_path) == ".lgit" and isdir(current_path):
             continue
-        # elif current_path.startswith("..")
         elif isfile(current_path):
             add_file(current_path, parent_dir, descriptor, index_dict)
         elif isdir(current_path):
@@ -54,12 +53,17 @@ def add_file(current_path, parent_dir, descriptor, index_dict):
         - index_dict: the dictionary contains all the infos inside the index
         file.
     """
+    # Get the relative path from the repository
+    rel_path_from_repository = relpath(abspath(current_path), parent_dir)
+    # If the file is outside the repository, print error, return
+    if rel_path_from_repository.startswith(".."):
+        print("fatal: %s: '%s' is outside repository" % (current_path,
+                                                         current_path))
+        return
     # Read file content and hash it
     file_sha1_hash, file_content = read_and_hash(current_path)
     # Convert the modification time of the file to string
     mtime = convert_mtime_to_formatted_string(current_path)
-    # Get the relative path from the repository
-    rel_path_from_repository = relpath(abspath(current_path), parent_dir)
     try:
         update_info_when_add(descriptor, rel_path_from_repository,
                              mtime, file_sha1_hash, index_dict)
@@ -127,10 +131,9 @@ def make_directory_and_object_file(file_sha1_hash, file_content, parent_dir):
         # it
         try:
             new_file = open(new_file_path, "wb+")
+            new_file.write(file_content)
         except PermissionError:
             print("Cannot add an object to a lgit repository")
-            return
-        new_file.write(file_content)
     except TypeError:
         # Raise error if the sha1 hash is empty
         print("fatal: updating files failed")

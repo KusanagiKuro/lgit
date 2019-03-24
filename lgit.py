@@ -8,6 +8,7 @@ from show_status_lgit import show_status_lgit
 from show_log_lgit import show_log_lgit
 from utility import get_lgit_directory
 from list_files_lgit import list_files_lgit
+from branch_lgit import branch_lgit
 
 
 def createParser():
@@ -38,6 +39,9 @@ def createParser():
     list_files_parser = subparsers.add_parser("ls-files")
     # Create a subparser for status command
     status_parser = subparsers.add_parser("status")
+    # Create a subparser for branch command
+    branch_parser = subparsers.add_parser("branch")
+    branch_parser.add_argument("name", nargs="?")
     # Return the base parser
     return parser
 
@@ -59,7 +63,8 @@ def main():
                             "config": config_lgit,
                             "ls-files": list_files_lgit,
                             "log": show_log_lgit,
-                            "status": show_status_lgit}
+                            "status": show_status_lgit,
+                            "branch": branch_lgit}
             # Pass the argument to the respective function to execute
             functionDict[args.command](args, parent_dir)
         else:

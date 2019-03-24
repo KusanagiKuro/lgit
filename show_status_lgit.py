@@ -5,6 +5,7 @@ from os.path import join, isdir, isfile, relpath
 from index_related_funcs import *
 from datetime import datetime
 from utility import read_and_hash, convert_mtime_to_formatted_string
+from branch_related_funcs import get_current_branch
 
 
 def has_any_commit(parent_dir):
@@ -61,6 +62,14 @@ def list_all_in(dir_path, parent_dir, list_files=[]):
 
 
 def apply_change_on_index(index_dict, parent_dir):
+    """
+    Update the current index file with the local changes
+
+    Input:
+        - index_dict: the dictionary contains all the infos inside the index
+        file.
+        - parent_dir: the path of the lgit repository
+    """
     try:
         descriptor = os.open(join(parent_dir, ".lgit/index"),
                              os.O_RDWR | os.O_CREAT)
@@ -140,15 +149,33 @@ Untracked files:
 
 
 def show_status_lgit(args, parent_dir):
+    """
+    Show status of lgit
+
+    Input:
+        - args: The arguments parsed by the parser
+        - parent_dir: the path of the lgit repository
+    """
+    # Get all the files from the current directory
     list_files = list_all_in(getcwd(), parent_dir)
+    # Read the content of the index file
     index_dict = get_index_dictionary(parent_dir)
+    # Update the index file with the current change of all tracked files.
     apply_change_on_index(index_dict, parent_dir)
+    # Get the new content
     index_dict = get_index_dictionary(parent_dir)
-    print('On branch master')
+    # Start printing
+    branch = 'master'
+    # branch = get_current_branch(parent_dir)
+    print('On branch', branch)
+    # If there is no commit, print the appropriate message
     if not has_any_commit(parent_dir):
         print('\nNo commits yet')
+    # Get the changes to be commited, changes not stage for commit and
+    # untracked file lists.
     commit_list, non_commit_list, untracked_list = get_status_lst(list_files,
                                                                   index_dict)
+    # Print each of those list
     print_change_in_commit(commit_list)
     print_change_not_in_commit(non_commit_list)
     print_untracked_files(untracked_list)

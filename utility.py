@@ -3,6 +3,7 @@ import os
 from hashlib import sha1
 from os import path
 from datetime import datetime
+from os.path import relpath, expanduser, isdir, dirname, getmtime
 
 
 def handle_path(name):
@@ -10,8 +11,8 @@ def handle_path(name):
     Return a relative path from the current directory
     """
     if name.startswith("~"):
-        name = path.expanduser(name)
-    return path.relpath(name, ".")
+        name = expanduser(name)
+    return relpath(name, ".")
 
 
 def read_and_hash(file_path, is_content_needed=True):
@@ -55,9 +56,9 @@ def get_lgit_directory():
     """
     dir_path = os.getcwd()
     while dir_path != "/":
-        if path.isdir(dir_path + "/.lgit"):
+        if isdir(dir_path + "/.lgit"):
             return dir_path
-        dir_path = path.dirname(dir_path)
+        dir_path = dirname(dir_path)
     return None
 
 
@@ -72,5 +73,15 @@ def convert_mtime_to_formatted_string(current_path):
         - timestamp_string: the 14-character string represent year, month, day,
         hour, minute, second
     """
-    timestamp = datetime.fromtimestamp(path.getmtime(current_path))
+    timestamp = datetime.fromtimestamp(getmtime(current_path))
     return datetime.strftime(timestamp, "%Y%m%d%H%M%S")
+
+
+def get_mtime(dir_entry):
+    """
+    Get the modification time of a directory entry
+
+    Input:
+        - dir_entry: A DirEntry object returned by os.scandir
+    """
+    return dir_entry.stat().st_mtime
